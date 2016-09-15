@@ -8,40 +8,62 @@
         Handlebars.templates[script.id] = Handlebars.compile(script.innerHTML);
     });
 
-    let Router = Backbone.Router.extend({
+    var Router = Backbone.Router.extend({
         routes: {
-            '/': '/'
+            'registration': 'registration',
+            'login': 'login'
+        },
+        login: function () {
+            new LoginView({
+                model: new LoginModel(),
+                el: "#main"
+            });
+        },
+        registration: function () {
+            new RegistrationView({
+                model: new RegistrationModel(),
+                el: "#main"
+            });
         }
     });
 
-    let router = new Router();
-
-    Backbone.history.start();
-
-    let UsersModel = Backbone.Model.extend({
+    var LoginModel = Backbone.Model.extend({
         initialize: function () {
         },
-        url: '/'
+        url: '/login'
     });
 
-    let usersModel = new UsersModel();
+    var RegistrationModel = Backbone.Model.extend({
+        initialize: function() {
+        },
+        url: '/registration'
+    })
 
-    let PageView = Backbone.View.extend({
+    var RegistrationView = Backbone.View.extend({
         initialize: function() {
             this.render();
+        },
+        render: function() {
+            this.$el.html(Handlebars.templates.registrationForm())
+        }
+    })
 
+    var LoginView = Backbone.View.extend({
+        initialize: function() {
+            this.render();
+            console.log(this.model.id);
         },
         render: function() {
 
-
-            this.$el.html(Handlebars.templates.noid())
+            this.$el.html(Handlebars.templates.loginForm())
         },
         events: {
             'click #data': function(e) {
                 console.log('Helo');
             }
         },
-        el: "#main"
     })
-    new PageView();
+
+    var router = new Router();
+    Backbone.history.start();
 }())
