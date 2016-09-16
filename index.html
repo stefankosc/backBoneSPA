@@ -10,31 +10,49 @@
 
         </div>
 
+        <script id="startPage" type="text/handlebars">
+
+            <h2>Register or login</h2>
+            <div id="buttons">
+            <button id="registrationButton" >Register</button>
+
+            <button id="loginButton" >Login</button>
+            </div>
+
+        </script>
+
         <script id="loginForm" type="text/handlebars">
 
-            <form id="loginData" action="/" method="post">
+            <form id="loginData">
                 Email address:<br>
                 <input type="text" name="email"><br>
                 Password: <br>
                 <input type="text" name="password"><br>
-                <input type="submit">
+                <input type="button" name="loginInput" value="Login">
             </form>
 
         </script>
 
         <script id="registrationForm" type="text/handlebars">
 
-            <form id="registrationData" action="/" method="post">
+            <form id="registrationData">
                 Name:<br>
                 <input type="text" name="name"><br>
                 Email address:<br>
                 <input type="text" name="email"><br>
                 Password: <br>
                 <input type="text" name="password"><br>
-                <input type="submit">
+                <input type="button" name="registrationInput" value="Register">
             </form>
 
         </script>
+
+        <script id="messagesBoard" type="text/handlebars">
+            <textarea id="messageBoard">type a message...</textarea>
+            <input type="button" name="messageSubmition" value="submit a message">
+        </script>
+
+
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
