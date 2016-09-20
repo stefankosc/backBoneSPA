@@ -13,7 +13,8 @@
             'startpage': 'startpage',
             'registration': 'registration',
             'login': 'login',
-            'messages': 'messages'
+            'messages': 'messages',
+            'newmessage': 'newmessage'
 
         },
         login: function () {
@@ -43,10 +44,18 @@
                 model: new MessagesModel(),
                 el: "#main"
             });
+        },
+        newmessage: function () {
+            $('#main').off();
+            new NewMessageView({
+                model: new NewMessageModel(),
+                el: "#main"
+            })
         }
     });
 
 
+//-------------------------------------------------------------------------------------------------------------
 
 
     var StartpageModel = Backbone.Model.extend({
@@ -75,11 +84,13 @@
     });
 
 
+//-------------------------------------------------------------------------------------------------------------
 
 
     var RegistrationModel = Backbone.Model.extend({
         save: function() {
             return $.post(this.url, this.toJSON());
+
         },
         url: '/registration'
     });
@@ -108,13 +119,15 @@
         }
     });
 
+//-------------------------------------------------------------------------------------------------------------
 
 
 
     var LoginModel = Backbone.Model.extend({
-        initialize: function () {
-
+        save: function() {
+            return $.post(this.url, this.toJSON());
         },
+
         url: '/login'
     });
 
@@ -128,33 +141,86 @@
         },
         events: {
             'click input[type="button"][name="loginInput"]': function(e) {
-                this.model.save($('#loginData').find('input[name="email"]').val());
-                this.model.save($('#loginData').find('input[name="password"]').val());
+                var wi = this;
+
+                this.model.set(
+                    {
+                        'email': $('#loginData').find('input[name="email"]').val(),
+                        'password': $('#loginData').find('input[name="password"]').val()
+
+                    }
+                ).save()
+                .then(function() {
+
+                    console.log('logged');
+
+
+                    window.location.hash = 'messages';
+                })
+                .catch(function() {
+                    $('#loginData').find('input[name="email"]').val('');
+                    $('#loginData').find('input[name="password"]').val('');
+                    window.location.hash = 'login';
+                    wi.$el.find('h2').show();
+                    wi.$el.find('h3').show();
+                    console.log('fdsfs')
+                });
             }
         }
     });
-
-
-
+//-------------------------------------------------------------------------------------------------------------
 
     var MessagesModel = Backbone.Model.extend({
+        post: function() {
+            var mo = this;
+                return $.post(this.url, this.toJSON()).then(function() {
+                    mo.fetch();
+                });
+        },
+
+        initialize: function() {
+
+            this.fetch();
+        },
 
         url: '/messages'
     });
 
     var MessagesView = Backbone.View.extend({
         initialize: function() {
-            this.render();
+            var view = this;
+            this.model.on('change', function () {
+                view.render();
+            });
         },
         render: function() {
-            this.$el.html(Handlebars.templates.messagesBoard())
-        }
+
+            this.$el.html(Handlebars.templates.messagesBoard(this.model.toJSON()));
+
+        },
+        events: {
+
+            'click input[type="button"][name="messageSubmition"]': function(e) {
+                console.log('aaaa');
+                this.model.set(
+                    {
+                        'message': $('#messageBoard').val()
+                    }
+                ).post()
+                .then(function() {
+                    console.log('hohoh')
+                    window.location.hash = 'messages';
+                })
+                .catch(function() {
+                    console.log('there is smth wrong with message');
+                });
+            },
+         }
     });
 
+//-------------------------------------------------------------------------------------------------------------
 
     var router = new Router();
-    console.log(Router);
     Backbone.history.start();
     window.location.hash = 'startpage';
-
 }())

@@ -30,6 +30,7 @@
                 <input type="text" name="password"><br>
                 <input type="button" name="loginInput" value="Login">
             </form>
+            <h2 style="display: none">Login or password is not correct<br><h3 style="display: none">Try again</h3></h2>
 
         </script>
 
@@ -48,8 +49,34 @@
         </script>
 
         <script id="messagesBoard" type="text/handlebars">
-            <textarea id="messageBoard">type a message...</textarea>
-            <input type="button" name="messageSubmition" value="submit a message">
+
+
+        <table>
+            <tr>
+                <th>id</th>
+                <th>name</th>
+                <th>message</th>
+            </tr>
+            {{#messages}}
+            <tr>
+
+                <td>{{id}}</td>
+                <td>{{name}}</td>
+                <td>{{message}}</td>
+
+            <tr>
+            {{/messages}}
+        </table>
+
+        <textarea id="messageBoard"></textarea>
+        <div>
+        <input type="button" name="messageSubmition" value="submit a message">
+        </div>
+        <div>
+        <a href="/logout" style="text-decoration: none; border: 2px solid black; font-style: italic">logout</a>
+        </div>
+
+
         </script>
 
 
