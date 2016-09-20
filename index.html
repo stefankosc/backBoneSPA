@@ -43,38 +43,51 @@
                 <input type="text" name="email"><br>
                 Password: <br>
                 <input type="text" name="password"><br>
+
+                <div>
+                    <input type="file" style="font-size: 18px">
+                </div>
+
                 <input type="button" name="registrationInput" value="Register">
             </form>
+
+
+
 
         </script>
 
         <script id="messagesBoard" type="text/handlebars">
 
 
-        <table>
-            <tr>
-                <th>id</th>
-                <th>name</th>
-                <th>message</th>
-            </tr>
-            {{#messages}}
-            <tr>
+            <table>
+                <tr>
+                    <th>id</th>
+                    <th>name</th>
+                    <th>message</th>
+                </tr>
+                {{#messages}}
+                <tr>
 
-                <td>{{id}}</td>
-                <td>{{name}}</td>
-                <td>{{message}}</td>
+                    <td>{{id}}</td>
+                    <td>{{name}}</td>
+                    <td>{{message}}</td>
 
-            <tr>
-            {{/messages}}
-        </table>
+                <tr>
+                {{/messages}}
+            </table>
 
-        <textarea id="messageBoard"></textarea>
-        <div>
-        <input type="button" name="messageSubmition" value="submit a message">
-        </div>
-        <div>
-        <a href="/logout" style="text-decoration: none; border: 2px solid black; font-style: italic">logout</a>
-        </div>
+            <textarea id="messageBoard"></textarea>
+            <div>
+                <input type="button" name="messageSubmition" value="submit a message">
+                <br>
+                <br>
+            </div>
+
+            <div>
+                <a href="/logout" style="text-decoration: none; font-size: 22px; font-style: italic">logout</a>
+                <br>
+                <br>
+            <div>
 
 
         </script>

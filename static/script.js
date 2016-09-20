@@ -44,14 +44,8 @@
                 model: new MessagesModel(),
                 el: "#main"
             });
-        },
-        newmessage: function () {
-            $('#main').off();
-            new NewMessageView({
-                model: new NewMessageModel(),
-                el: "#main"
-            })
         }
+
     });
 
 
@@ -92,6 +86,18 @@
             return $.post(this.url, this.toJSON());
 
         },
+        setImage: function(file) {
+
+            var formData = new FormData();
+            formData.append('file', file);
+            return $.ajax({
+                url: '/upload',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false
+            });
+        },
         url: '/registration'
     });
 
@@ -104,6 +110,8 @@
         },
         events: {
             'click input[name="registrationInput"]': function(e) {
+                var img = this;
+
                 this.model.set(
                     {
                         'name': $('#registrationData').find('input[name="name"]').val(),
@@ -113,9 +121,13 @@
 
                 ).save().then(function() {
                     console.log('saved');
+                    var file = $('input[type="file"]').get(0).files[0];
+
+                    img.model.setImage(file);
                     window.location.hash = 'messages';
-                })
-            }
+                });
+            },
+
         }
     });
 
@@ -173,9 +185,9 @@
     var MessagesModel = Backbone.Model.extend({
         post: function() {
             var mo = this;
-                return $.post(this.url, this.toJSON()).then(function() {
-                    mo.fetch();
-                });
+            return $.post(this.url, this.toJSON()).then(function() {
+                mo.fetch();
+            });
         },
 
         initialize: function() {
@@ -214,7 +226,7 @@
                 .catch(function() {
                     console.log('there is smth wrong with message');
                 });
-            },
+            }
          }
     });
 

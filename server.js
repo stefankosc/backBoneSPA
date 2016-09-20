@@ -4,6 +4,27 @@ const credentials = require('./credentials');
 const pg = require('pg');
 //var bcrypt = require('bcrypt');
 var cookieSession = require('cookie-session');
+var multer = require('multer');
+
+
+var diskStorage = multer.diskStorage({
+
+    destination: function (req, file, callback) {
+        callback(null, __dirname + '/uploads');
+    },
+    filename: function (req, file, callback) {
+        callback(null, req.session.user.userID + '_' + Date.now() + file.originalname);
+    }
+});
+
+var uploader = multer({
+
+    storage: diskStorage,
+    limits: {
+        filesize: 2097152
+    }
+});
+
 
 
 app.use(cookieSession({
@@ -12,6 +33,7 @@ app.use(cookieSession({
 }))
 
 app.use(express.static(__dirname + '/static'));
+app.use(express.static(__dirname + '/uploads'));
 app.use(require('body-parser').urlencoded({
     extended: false
 }));
@@ -159,6 +181,20 @@ app.post('/messages', function (req, res) {
             );
         }
     });
+});
+
+app.post('/upload', uploader.single('file'), function(req, res) {
+
+    if (req.file) {
+        res.json({
+            success: true,
+            file: '/uploads/' + req.file.filename
+        });
+    } else {
+        res.json({
+            success: false
+        });
+    }
 });
 
 app.listen(8080);
