@@ -48,7 +48,6 @@
 
     });
 
-
 //-------------------------------------------------------------------------------------------------------------
 
 
@@ -83,6 +82,7 @@
 
     var RegistrationModel = Backbone.Model.extend({
         save: function() {
+            
             return $.post(this.url, this.toJSON());
 
         },
@@ -110,7 +110,7 @@
         },
         events: {
             'click input[name="registrationInput"]': function(e) {
-                var img = this;
+                var registrationView = this;
 
                 this.model.set(
                     {
@@ -121,9 +121,10 @@
 
                 ).save().then(function() {
                     console.log('saved');
+
                     var file = $('input[type="file"]').get(0).files[0];
 
-                    img.model.setImage(file);
+                    registrationView.model.setImage(file);
                     window.location.hash = 'messages';
                 });
             },
@@ -165,7 +166,6 @@
                 .then(function() {
 
                     console.log('logged');
-
 
                     window.location.hash = 'messages';
                 })

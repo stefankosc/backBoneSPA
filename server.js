@@ -25,13 +25,17 @@ var uploader = multer({
     }
 });
 
-
-
 app.use(cookieSession({
   name: 'session',
   keys: ['key1', 'key2']
 }))
-
+app.use(function(req, res, next) {
+    if (req.url.startsWith('/user/') && !req.session.user) {
+        res.rediderct('/');
+        return;
+    }
+    next();
+})
 app.use(express.static(__dirname + '/static'));
 app.use(express.static(__dirname + '/uploads'));
 app.use(require('body-parser').urlencoded({
@@ -55,15 +59,15 @@ app.get('/', function (req, res) {
 
 app.post('/registration', function(req, res) {
 
-    //cache.del('users');
     if (!req.body.name.length || !req.body.email.length || !req.body.password.length) {
-        //res.redirect('/name/index.html');
         return;
     } else {
         var client = createNewPsqlClient(credentials.pgUser, credentials.pgPassword);
 
-        var query = 'INSERT INTO messageBoardUsers(name, email, password) VALUES($1, $2, $3) RETURNING id';
+
+        var query = 'INSERT INTO messageBoardUsers(name, email, password) VALUES($1, $2, $3) RETURNING id, name';
         var name = req.body.name;
+        console.log(req.body);
         var email = req.body.email;
         var password = req.body.password;
 
@@ -77,22 +81,29 @@ app.post('/registration', function(req, res) {
 
                     client.end();
 
+
                     req.session.user = {
                         userID: results.rows[0].id,
                         name: results.rows[0].name
                     }
 
+                    /*var clientImg = createNewPsqlClient(credentials.pgUser, credentials.pgPassword);
+
+                    var query = 'UPDATE messageBoardUsers SET imageurl = $1 WHERE id =$2;';
+
+
+                    var imageurll = req.file
+                    */
                     res.sendStatus(200);
                 }
             });
-        //});
     }
 });
 
 app.post('/login', function (req, res) {
 
     if (!req.body.email.length || !req.body.password.length) {
-        //res.redirect('/name/index.html');
+
         return;
     } else {
         var client = createNewPsqlClient(credentials.pgUser, credentials.pgPassword);
@@ -154,13 +165,13 @@ app.get('/messages', function (req, res) {
             res.json({
                 messages: results.rows
             });
-            console.log(req.session);
+
         }
     });
 })
 
 app.post('/messages', function (req, res) {
-    console.log(req.session);
+
     var client = createNewPsqlClient(credentials.pgUser, credentials.pgPassword);
     var query = 'INSERT INTO messages(name, message, userid) VALUES($1, $2, $3) RETURNING id;';
     var name = req.session.user.name;
@@ -196,5 +207,22 @@ app.post('/upload', uploader.single('file'), function(req, res) {
         });
     }
 });
+
+//------------------------------------------------------------------------------------------------------
+//routes for second part of assignment where user can UPDATE or DELETE his messages
+
+app.get('/user/messages', function(req, res) {
+    console.log('request received');
+    console.log(req.body);
+    console.log(req.session);
+
+
+
+});
+
+app.delete('/message/:id', function(req, res) {
+
+})
+
 
 app.listen(8080);
