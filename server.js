@@ -31,7 +31,7 @@ app.use(cookieSession({
 }))
 app.use(function(req, res, next) {
     if (req.url.startsWith('/user/') && !req.session.user) {
-        res.rediderct('/');
+        res.redirect('/');
         return;
     }
     next();
@@ -215,7 +215,19 @@ app.get('/user/messages', function(req, res) {
     console.log('request received');
     console.log(req.body);
     console.log(req.session);
+    var client = createNewPsqlClient(credentials.pgUser, credentials.pgPassword);
+    var query = 'SELECT * FROM messages WHERE name = $1;';
+    client.query(query, [req.session.user.name], function(err, results) {
+        if (err) {
+            console.log(err);
+        } else {
 
+            res.json(results.rows);
+
+        }
+    });
+
+    //res.sendStatus(200);
 
 
 });
