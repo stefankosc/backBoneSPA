@@ -82,7 +82,7 @@
 
     var RegistrationModel = Backbone.Model.extend({
         save: function() {
-            
+
             return $.post(this.url, this.toJSON());
 
         },
@@ -234,5 +234,10 @@
 
     var router = new Router();
     Backbone.history.start();
-    window.location.hash = 'startpage';
+    if (!adell.logged) {
+        location.hash = 'startpage';
+    } else {
+        location.hash = 'messages';
+    }
+
 }())

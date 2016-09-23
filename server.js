@@ -5,7 +5,28 @@ const pg = require('pg');
 //var bcrypt = require('bcrypt');
 var cookieSession = require('cookie-session');
 var multer = require('multer');
+const csrf = require('csurf');
+var hb = require('express-handlebars');
+hb = hb.create({
+    helpers: {
+        'raw-helper': function(options) {
+            return options.fn();
+        }
+    }
+});
 
+
+// error handler
+app.use(function (err, req, res, next) {
+  if (err.code !== 'EBADCSRFTOKEN') return next(err)
+
+  // handle CSRF token errors here
+  res.status(403)
+  res.send('something is wrong')
+})
+
+app.engine('handlebars', hb.engine);
+app.set('view engine', 'handlebars');
 
 var diskStorage = multer.diskStorage({
 
@@ -54,7 +75,19 @@ createNewPsqlClient = function (pgUser, pgPassword) {
 
 app.get('/', function (req, res) {
 
-    res.sendFile(__dirname + '/index.html');
+    var bool;
+    if (req.session.user) {
+        bool = true;
+    }
+
+    res.render('index', {
+        isLogged: bool,
+        'raw-helper': function(options) {
+
+            return options.fn();
+
+        }
+    });
 });
 
 app.post('/registration', function(req, res) {
@@ -67,7 +100,6 @@ app.post('/registration', function(req, res) {
 
         var query = 'INSERT INTO messageBoardUsers(name, email, password) VALUES($1, $2, $3) RETURNING id, name';
         var name = req.body.name;
-        console.log(req.body);
         var email = req.body.email;
         var password = req.body.password;
 
@@ -211,10 +243,8 @@ app.post('/upload', uploader.single('file'), function(req, res) {
 //------------------------------------------------------------------------------------------------------
 //routes for second part of assignment where user can UPDATE or DELETE his messages
 
-app.get('/user/messages', function(req, res) {
-    console.log('request received');
-    console.log(req.body);
-    console.log(req.session);
+app.get('/user/messages', csrf(), function(req, res) {
+
     var client = createNewPsqlClient(credentials.pgUser, credentials.pgPassword);
     var query = 'SELECT * FROM messages WHERE name = $1;';
     client.query(query, [req.session.user.name], function(err, results) {
@@ -222,19 +252,32 @@ app.get('/user/messages', function(req, res) {
             console.log(err);
         } else {
 
-            res.json(results.rows);
+            res.json({
+                data: results.rows,
+                token: req.csrfToken()
+            });
+
 
         }
     });
-
-    //res.sendStatus(200);
-
-
 });
 
-app.delete('/message/:id', function(req, res) {
+app.delete('/message/:id', csrf(), function(req, res) {
 
-})
+    var client = createNewPsqlClient(credentials.pgUser, credentials.pgPassword);
+    var query = 'DELETE FROM messages WHERE id = $1 AND userid = $2;';
+    client.query(query, [req.params.id, req.session.user.userID], function(err, results) {
+        console.log(req.session);
+        console.log(req.params.id);
+        if (err) {
+            console.log(err);
+        } else {
 
+            res.sendStatus(200);
+            //res.json(results.rows);
+        }
+    });
+
+});
 
 app.listen(8080);
